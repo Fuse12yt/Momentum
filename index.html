@@ -13,7 +13,7 @@ box-sizing:border-box;
 }
 
 body{
-font-family: 'Inter', sans-serif;
+font-family:'Inter',sans-serif;
 background: radial-gradient(circle at top,#0f172a,#020617);
 color:white;
 overflow-x:hidden;
@@ -50,8 +50,8 @@ font-size:22px;
 opacity:0.8;
 }
 
-.cta{
-margin-top:40px;
+.cta, button{
+margin-top:20px;
 padding:15px 40px;
 border:none;
 border-radius:30px;
@@ -61,7 +61,7 @@ background:linear-gradient(90deg,#00f5a0,#00d9f5);
 transition:0.3s;
 }
 
-.cta:hover{
+.cta:hover, button:hover{
 transform:scale(1.1);
 box-shadow:0 0 25px #00f5a0;
 }
@@ -81,22 +81,13 @@ margin-bottom:30px;
 box-shadow:0 0 40px rgba(0,0,0,0.4);
 }
 
-input,button{
+input{
 padding:12px;
 margin:10px;
 border-radius:12px;
 border:none;
 font-size:15px;
-}
-
-input{
 width:220px;
-}
-
-button{
-background:linear-gradient(90deg,#00f5a0,#00d9f5);
-cursor:pointer;
-font-weight:bold;
 }
 
 .big{
@@ -109,6 +100,7 @@ background:rgba(255,255,255,0.05);
 padding:20px;
 border-radius:15px;
 margin:10px 0;
+text-align:left;
 }
 
 .stars{
@@ -128,35 +120,35 @@ font-size:13px;
 
 <section class="hero">
 <h1 class="logo">AUREXIS</h1>
-<p class="tagline">Own Your Time. Print Your Future.</p>
-<button class="cta" onclick="scrollToApp()">Start Now</button>
+<p class="tagline">Maîtrisez votre temps. Créez votre avenir.</p>
+<button class="cta" onclick="scrollToApp()">Commencer</button>
 </section>
 
 <div class="container" id="app">
 
 <div class="card">
-<h2>Activate System</h2>
-<input type="text" id="username" placeholder="Name"><br>
-<input type="number" id="lostHours" placeholder="Hours wasted / day"><br>
-<input type="number" id="hourValue" placeholder="€ value per hour"><br>
-<button onclick="start()">Launch</button>
+<h2>Activez votre système</h2>
+<input type="text" id="username" placeholder="Votre nom"><br>
+<input type="number" id="lostHours" placeholder="Heures perdues / jour"><br>
+<input type="number" id="hourValue" placeholder="Valeur €/heure" value="11.65"><br>
+<button onclick="start()">Lancer</button>
 </div>
 
 <div class="card">
 <h2 id="welcome"></h2>
-<p>💰 Total Generated: <strong id="money">0</strong> €</p>
-<p>🔥 Streak: <span id="streak">0</span> days</p>
+<p>💰 Argent généré : <strong id="money">0</strong> €</p>
+<p>🔥 Streak : <span id="streak">0</span> jours</p>
 </div>
 
 <div class="card">
-<h3>Focus Session</h3>
+<h3>Session de focus</h3>
 <input type="number" id="focusMinutes" placeholder="Minutes">
-<button onclick="startFocus()">Start Focus</button>
+<button onclick="startFocus()">Démarrer le focus</button>
 <div class="big" id="timer">00:00</div>
 </div>
 
 <div class="card">
-<h3>Financial Projection</h3>
+<h3>Projection financière</h3>
 <p id="yearLoss"></p>
 <p id="yearGain"></p>
 <p id="threeYear"></p>
@@ -164,23 +156,23 @@ font-size:13px;
 </div>
 
 <div class="card">
-<h3>⭐ Google Reviews</h3>
+<h3>⭐ Avis Google</h3>
 
 <div class="review">
 <div class="stars">★★★★★</div>
-<p>"This changed how I see my time. Unreal concept."</p>
+<p>"Ce site m’a fait réaliser la valeur de mon temps. Incroyable !" </p>
 <small>- Daniel R.</small>
 </div>
 
 <div class="review">
 <div class="stars">★★★★★</div>
-<p>"Feels like a billion dollar startup already."</p>
+<p>"On dirait une vraie startup à plusieurs millions déjà."</p>
 <small>- Sophie M.</small>
 </div>
 
 <div class="review">
 <div class="stars">★★★★★</div>
-<p>"Simple. Powerful. Addictive."</p>
+<p>"Simple. Puissant. Addictif."</p>
 <small>- Lucas V.</small>
 </div>
 
@@ -199,30 +191,22 @@ money:0,
 streak:0,
 lastLogin:null,
 lostPerDay:0,
-hourValue:0,
+hourValue:11.65,
 history:[]
 };
 
-function save(){
-localStorage.setItem("aurexis",JSON.stringify(data));
-}
+function save(){localStorage.setItem("aurexis",JSON.stringify(data));}
 
-function scrollToApp(){
-document.getElementById("app").scrollIntoView({behavior:"smooth"});
-}
+function scrollToApp(){document.getElementById("app").scrollIntoView({behavior:"smooth"});}
 
 function start(){
 let name=document.getElementById("username").value;
 data.lostPerDay=parseFloat(document.getElementById("lostHours").value);
-data.hourValue=parseFloat(document.getElementById("hourValue").value);
+data.hourValue=parseFloat(document.getElementById("hourValue").value)||11.65;
 
-if(!name||!data.lostPerDay||!data.hourValue){
-alert("Fill everything");
-return;
-}
+if(!name||!data.lostPerDay){alert("Remplissez tous les champs");return;}
 
-document.getElementById("welcome").innerText="Welcome "+name;
-
+document.getElementById("welcome").innerText="Bienvenue "+name;
 updateStreak();
 updateProjection();
 save();
@@ -264,16 +248,16 @@ save();
 function updateProjection(){
 let yearlyLost=data.lostPerDay*365;
 let yearlyPotential=yearlyLost*data.hourValue;
-let three=yearlyPotential*3;
+let threeYear=yearlyPotential*3;
 
 document.getElementById("yearLoss").innerText=
-"Time lost per year: "+yearlyLost+" hours";
+"Temps perdu par an : "+yearlyLost+" heures";
 
 document.getElementById("yearGain").innerText=
-"Potential income/year: "+yearlyPotential.toFixed(0)+" €";
+"Revenu potentiel / an : "+yearlyPotential.toFixed(0)+" €";
 
 document.getElementById("threeYear").innerText=
-"Potential income in 3 years: "+three.toFixed(0)+" €";
+"Revenu potentiel sur 3 ans : "+threeYear.toFixed(0)+" €";
 
 let ctx=document.getElementById("chart");
 new Chart(ctx,{
@@ -281,7 +265,7 @@ type:"line",
 data:{
 labels:data.history.map((_,i)=>i+1),
 datasets:[{
-label:"Money Generated",
+label:"Argent généré (€)",
 data:data.history,
 borderColor:"#00f5a0",
 fill:false
