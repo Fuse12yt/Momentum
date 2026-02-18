@@ -2,103 +2,122 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Momentum</title>
+<title>AUREXIS</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
 
 body{
-margin:0;
-font-family: 'Segoe UI', sans-serif;
-background: linear-gradient(135deg,#0f0c29,#302b63,#24243e);
+font-family: 'Inter', sans-serif;
+background: radial-gradient(circle at top,#0f172a,#020617);
 color:white;
+overflow-x:hidden;
+}
+
+.hero{
+height:100vh;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+text-align:center;
+background:radial-gradient(circle at 30% 30%,#1e293b,#020617 70%);
+}
+
+.logo{
+font-size:90px;
+font-weight:800;
+letter-spacing:8px;
+background:linear-gradient(90deg,#00f5a0,#00d9f5,#8a2be2);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+animation:glow 3s infinite alternate;
+}
+
+@keyframes glow{
+from{filter:drop-shadow(0 0 10px #00f5a0);}
+to{filter:drop-shadow(0 0 30px #8a2be2);}
+}
+
+.tagline{
+margin-top:20px;
+font-size:22px;
+opacity:0.8;
+}
+
+.cta{
+margin-top:40px;
+padding:15px 40px;
+border:none;
+border-radius:30px;
+font-weight:bold;
+cursor:pointer;
+background:linear-gradient(90deg,#00f5a0,#00d9f5);
+transition:0.3s;
+}
+
+.cta:hover{
+transform:scale(1.1);
+box-shadow:0 0 25px #00f5a0;
 }
 
 .container{
 max-width:1100px;
 margin:auto;
-padding:40px;
-}
-
-h1{
-font-size:40px;
-margin-bottom:5px;
-}
-
-.subtitle{
-opacity:0.7;
-margin-bottom:30px;
+padding:60px 20px;
 }
 
 .card{
-background:rgba(255,255,255,0.07);
-backdrop-filter:blur(15px);
+background:rgba(255,255,255,0.05);
+backdrop-filter:blur(20px);
 border-radius:20px;
-padding:25px;
-margin-bottom:25px;
-box-shadow:0 0 50px rgba(0,0,0,0.4);
+padding:30px;
+margin-bottom:30px;
+box-shadow:0 0 40px rgba(0,0,0,0.4);
 }
 
-input,select,button{
+input,button{
 padding:12px;
-margin:8px;
+margin:10px;
 border-radius:12px;
 border:none;
 font-size:15px;
 }
 
-input,select{
+input{
 width:220px;
 }
 
 button{
 background:linear-gradient(90deg,#00f5a0,#00d9f5);
-color:black;
-font-weight:bold;
 cursor:pointer;
-transition:0.3s;
-}
-
-button:hover{
-transform:scale(1.05);
-}
-
-.progress-bar{
-height:20px;
-background:#1e1e2f;
-border-radius:10px;
-margin-top:15px;
-}
-
-.progress{
-height:20px;
-background:linear-gradient(90deg,#00f5a0,#00d9f5);
-border-radius:10px;
-width:0%;
-transition:0.4s;
-}
-
-.stat{
-font-size:18px;
-margin:6px 0;
-}
-
-.badge{
-display:inline-block;
-background:linear-gradient(90deg,#ff9966,#ff5e62);
-padding:6px 12px;
-margin:5px;
-border-radius:12px;
-font-size:12px;
+font-weight:bold;
 }
 
 .big{
-font-size:30px;
+font-size:28px;
 margin-top:10px;
+}
+
+.review{
+background:rgba(255,255,255,0.05);
+padding:20px;
+border-radius:15px;
+margin:10px 0;
+}
+
+.stars{
+color:gold;
 }
 
 .footer{
 text-align:center;
-margin-top:40px;
+margin:40px 0;
 opacity:0.5;
 font-size:13px;
 }
@@ -107,90 +126,106 @@ font-size:13px;
 </head>
 <body>
 
-<div class="container">
+<section class="hero">
+<h1 class="logo">AUREXIS</h1>
+<p class="tagline">Own Your Time. Print Your Future.</p>
+<button class="cta" onclick="scrollToApp()">Start Now</button>
+</section>
 
-<h1>Momentum</h1>
-<p class="subtitle">Turn Time Into Power</p>
+<div class="container" id="app">
 
-<div class="card" id="setup">
-<h2>Créer ton Profil</h2>
-<input type="text" id="username" placeholder="Pseudo"><br>
-<input type="number" id="lostHours" placeholder="Heures perdues / jour"><br>
-<button onclick="start()">Activer</button>
+<div class="card">
+<h2>Activate System</h2>
+<input type="text" id="username" placeholder="Name"><br>
+<input type="number" id="lostHours" placeholder="Hours wasted / day"><br>
+<input type="number" id="hourValue" placeholder="€ value per hour"><br>
+<button onclick="start()">Launch</button>
 </div>
-
-<div id="app" style="display:none;">
 
 <div class="card">
 <h2 id="welcome"></h2>
-<div class="stat">Niveau : <span id="level"></span></div>
-<div class="stat">XP : <span id="xp"></span></div>
-<div class="stat">Score : <span id="score"></span></div>
-<div class="stat">🔥 Streak : <span id="streak"></span></div>
-<div class="progress-bar">
-<div class="progress" id="progressBar"></div>
-</div>
+<p>💰 Total Generated: <strong id="money">0</strong> €</p>
+<p>🔥 Streak: <span id="streak">0</span> days</p>
 </div>
 
 <div class="card">
-<h3>⏳ Focus libre</h3>
+<h3>Focus Session</h3>
 <input type="number" id="focusMinutes" placeholder="Minutes">
-<button onclick="startFocus()">Lancer</button>
+<button onclick="startFocus()">Start Focus</button>
 <div class="big" id="timer">00:00</div>
 </div>
 
 <div class="card">
-<h3>📉 Analyse Temps</h3>
-<p id="lostYear"></p>
-<p id="potentialYear"></p>
+<h3>Financial Projection</h3>
+<p id="yearLoss"></p>
+<p id="yearGain"></p>
 <p id="threeYear"></p>
-</div>
-
-<div class="card">
-<h3>🏆 Badges</h3>
-<div id="badges"></div>
-</div>
-
-<div class="card">
-<h3>📈 Progression</h3>
 <canvas id="chart"></canvas>
 </div>
 
+<div class="card">
+<h3>⭐ Google Reviews</h3>
+
+<div class="review">
+<div class="stars">★★★★★</div>
+<p>"This changed how I see my time. Unreal concept."</p>
+<small>- Daniel R.</small>
 </div>
 
-<div class="footer">Momentum System</div>
+<div class="review">
+<div class="stars">★★★★★</div>
+<p>"Feels like a billion dollar startup already."</p>
+<small>- Sophie M.</small>
+</div>
 
+<div class="review">
+<div class="stars">★★★★★</div>
+<p>"Simple. Powerful. Addictive."</p>
+<small>- Lucas V.</small>
+</div>
+
+</div>
+
+</div>
+
+<div class="footer">
+AUREXIS © 2026
 </div>
 
 <script>
 
-let data=JSON.parse(localStorage.getItem("momentumPro"))||{
-username:"",
-xp:0,
-level:1,
+let data=JSON.parse(localStorage.getItem("aurexis"))||{
+money:0,
 streak:0,
 lastLogin:null,
-badges:[],
-history:[],
-score:0,
-lostPerDay:0
+lostPerDay:0,
+hourValue:0,
+history:[]
 };
 
 function save(){
-localStorage.setItem("momentumPro",JSON.stringify(data));
+localStorage.setItem("aurexis",JSON.stringify(data));
+}
+
+function scrollToApp(){
+document.getElementById("app").scrollIntoView({behavior:"smooth"});
 }
 
 function start(){
 let name=document.getElementById("username").value;
-let lost=parseFloat(document.getElementById("lostHours").value);
+data.lostPerDay=parseFloat(document.getElementById("lostHours").value);
+data.hourValue=parseFloat(document.getElementById("hourValue").value);
 
-if(!name||!lost){alert("Remplis tout");return;}
+if(!name||!data.lostPerDay||!data.hourValue){
+alert("Fill everything");
+return;
+}
 
-data.username=name;
-data.lostPerDay=lost;
+document.getElementById("welcome").innerText="Welcome "+name;
+
 updateStreak();
+updateProjection();
 save();
-render();
 }
 
 function updateStreak(){
@@ -199,6 +234,7 @@ if(data.lastLogin!==today){
 data.streak++;
 data.lastLogin=today;
 }
+document.getElementById("streak").innerText=data.streak;
 }
 
 function startFocus(){
@@ -215,61 +251,29 @@ display.innerText=(m<10?"0":"")+m+":"+(s<10?"0":"")+s;
 time--;
 if(time<0){
 clearInterval(interval);
-let gainedXP=minutes*2;
-data.xp+=gainedXP;
-data.history.push(data.xp);
-if(data.xp>=data.level*300){
-data.level++;
-unlockBadge();
-}
-data.score=Math.floor(data.xp + data.streak*50);
+let earned=(minutes/60)*data.hourValue;
+data.money+=earned;
+data.history.push(data.money);
+document.getElementById("money").innerText=data.money.toFixed(2);
+updateProjection();
 save();
-render();
 }
 },1000);
 }
 
-function unlockBadge(){
-if(data.level===3)data.badges.push("Rising");
-if(data.level===5)data.badges.push("Focused");
-if(data.level===8)data.badges.push("Elite");
-if(data.streak>=7)data.badges.push("Discipline");
-if(data.xp>=2000)data.badges.push("Beast Mode");
-}
+function updateProjection(){
+let yearlyLost=data.lostPerDay*365;
+let yearlyPotential=yearlyLost*data.hourValue;
+let three=yearlyPotential*3;
 
-function render(){
-document.getElementById("setup").style.display="none";
-document.getElementById("app").style.display="block";
+document.getElementById("yearLoss").innerText=
+"Time lost per year: "+yearlyLost+" hours";
 
-document.getElementById("welcome").innerText="Bienvenue "+data.username;
-document.getElementById("level").innerText=data.level;
-document.getElementById("xp").innerText=data.xp;
-document.getElementById("streak").innerText=data.streak;
-document.getElementById("score").innerText=data.score;
-
-document.getElementById("progressBar").style.width=(data.xp%(data.level*300))/(data.level*300)*100+"%";
-
-let lostYear=data.lostPerDay*365;
-let potentialYear=lostYear*2; 
-let threeYear=potentialYear*3;
-
-document.getElementById("lostYear").innerText=
-"Tu perds environ "+lostYear+" heures par an.";
-
-document.getElementById("potentialYear").innerText=
-"Si tu utilisais ces heures en focus → "+potentialYear+" XP potentiel/an.";
+document.getElementById("yearGain").innerText=
+"Potential income/year: "+yearlyPotential.toFixed(0)+" €";
 
 document.getElementById("threeYear").innerText=
-"Sur 3 ans → "+threeYear+" XP possible.";
-
-let b=document.getElementById("badges");
-b.innerHTML="";
-[...new Set(data.badges)].forEach(badge=>{
-let s=document.createElement("span");
-s.className="badge";
-s.innerText=badge;
-b.appendChild(s);
-});
+"Potential income in 3 years: "+three.toFixed(0)+" €";
 
 let ctx=document.getElementById("chart");
 new Chart(ctx,{
@@ -277,7 +281,7 @@ type:"line",
 data:{
 labels:data.history.map((_,i)=>i+1),
 datasets:[{
-label:"XP",
+label:"Money Generated",
 data:data.history,
 borderColor:"#00f5a0",
 fill:false
@@ -286,7 +290,10 @@ fill:false
 });
 }
 
-if(data.username)render();
+if(data.money){
+document.getElementById("money").innerText=data.money.toFixed(2);
+updateProjection();
+}
 
 </script>
 
