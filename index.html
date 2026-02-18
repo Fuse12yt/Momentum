@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Momentum</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+
+body{
+margin:0;
+font-family:Arial, sans-serif;
+background:linear-gradient(135deg,#0f172a,#020617);
+color:white;
+text-align:center;
+}
+
+.container{
+max-width:1100px;
+margin:auto;
+padding:30px;
+}
+
+.glass{
+background:rgba(255,255,255,0.05);
+backdrop-filter:blur(12px);
+border-radius:20px;
+padding:20px;
+margin:20px 0;
+box-shadow:0 0 40px rgba(34,197,94,0.15);
+}
+
+input,select,button{
+padding:10px;
+margin:6px;
+border-radius:10px;
+border:none;
+}
+
+button{
+background:#22c55e;
+color:white;
+cursor:pointer;
+transition:0.3s;
+}
+
+button:hover{
+transform:scale(1.05);
+}
+
+.progress-bar{
+height:18px;
+background:#1e293b;
+border-radius:10px;
+margin-top:10px;
+}
+
+.progress{
+height:18px;
+background:#22c55e;
+border-radius:10px;
+width:0%;
+transition:0.5s;
+}
+
+.badge{
+display:inline-block;
+background:#22c55e;
+padding:6px 12px;
+margin:5px;
+border-radius:12px;
+font-size:12px;
+}
+
+.rank{
+font-size:18px;
+margin-top:10px;
+}
+
+.footer{
+margin-top:40px;
+font-size:12px;
+opacity:0.6;
+}
+
+.timer-big{
+font-size:32px;
+margin:10px;
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<h1>🚀 Momentum</h1>
+<p>Turn Time Into Power</p>
+
+<div class="glass" id="setup">
+<h2>Créer ton Profil</h2>
+<input type="text" id="username" placeholder="Pseudo">
+<input type="number" id="hours" placeholder="Heures perdues / jour">
+<select id="goal">
+<option value="">Objectif</option>
+<option value="money">💰 Argent</option>
+<option value="skills">🧠 Compétences</option>
+<option value="fitness">💪 Physique</option>
+</select>
+<button onclick="start()">Activer Momentum</button>
+</div>
+
+<div id="app" style="display:none;">
+
+<div class="glass">
+<h2 id="welcome"></h2>
+<p class="rank" id="rank"></p>
+<p>Niveau <span id="level"></span> | XP <span id="xp"></span></p>
+<p>🔥 Streak: <span id="streak"></span> jours</p>
+<p>Score Momentum: <span id="score"></span></p>
+<div class="progress-bar">
+<div class="progress" id="progressBar"></div>
+</div>
+</div>
+
+<div class="glass">
+<h3>⏳ Focus Mode</h3>
+<select id="focusLength">
+<option value="1500">25 min</option>
+<option value="3000">50 min</option>
+<option value="5400">90 min</option>
+</select>
+<button onclick="startTimer()">Start</button>
+<div class="timer-big" id="timer">00:00</div>
+</div>
+
+<div class="glass">
+<h3>📉 Temps perdu / an</h3>
+<p id="lostTime"></p>
+</div>
+
+<div class="glass">
+<h3>📈 Progression</h3>
+<canvas id="chart"></canvas>
+</div>
+
+<div class="glass">
+<h3>🏆 Badges</h3>
+<div id="badges"></div>
+</div>
+
+<div class="glass">
+<h3>🤖 Coach IA</h3>
+<p id="ai"></p>
+</div>
+
+</div>
+
+<div class="footer">
+Momentum System
+</div>
+
+</div>
+
+<script>
+
+let data=JSON.parse(localStorage.getItem("momentumData"))||{
+username:"",
+xp:0,
+level:1,
+streak:0,
+lastLogin:null,
+badges:[],
+history:[],
+score:0,
+lostPerDay:0
+};
+
+function save(){
+localStorage.setItem("momentumData",JSON.stringify(data));
+}
+
+function start(){
+let name=document.getElementById("username").value;
+let hours=parseFloat(document.getElementById("hours").value);
+let goal=document.getElementById("goal").value;
+
+if(!name||!hours||!goal){alert("Remplis tout");return;}
+
+data.username=name;
+data.lostPerDay=hours;
+updateStreak();
+save();
+render();
+}
+
+function updateStreak(){
+let today=new Date().toDateString();
+if(data.lastLogin!==today){
+data.streak++;
+data.lastLogin=today;
+}
+}
+
+function startTimer(){
+let time=parseInt(document.getElementById("focusLength").value);
+let display=document.getElementById("timer");
+
+let interval=setInterval(()=>{
+let m=Math.floor(time/60);
+let s=time%60;
+display.innerText=(m<10?"0":"")+m+":"+(s<10?"0":"")+s;
+time--;
+if(time<0){
+clearInterval(interval);
+data.xp+=50;
+data.history.push(data.xp);
+if(data.xp>=data.level*200){
+data.level++;
+unlockBadge();
+}
+data.score=Math.floor(data.xp*1.5 + data.streak*20);
+save();
+render();
+}
+},1000);
+}
+
+function unlockBadge(){
+if(data.level===3)data.badges.push("Rising");
+if(data.level===5)data.badges.push("Focused");
+if(data.level===8)data.badges.push("Elite");
+if(data.streak>=7)data.badges.push("Discipline");
+if(data.xp>=1000)data.badges.push("Monster");
+}
+
+function getRank(){
+if(data.level<3)return "🥉 Bronze";
+if(data.level<5)return "🥈 Silver";
+if(data.level<8)return "🥇 Gold";
+if(data.level<12)return "💎 Diamond";
+return "🔥 Apex";
+}
+
+function generateAI(){
+if(data.level<3)return "Commence par 1h de focus par jour.";
+if(data.level<6)return "Augmente ton temps deep work.";
+if(data.level<10)return "Construis un projet réel.";
+return "Passe au niveau supérieur : crée ton business.";
+}
+
+function render(){
+document.getElementById("setup").style.display="none";
+document.getElementById("app").style.display="block";
+
+document.getElementById("welcome").innerText="Bienvenue "+data.username;
+document.getElementById("level").innerText=data.level;
+document.getElementById("xp").innerText=data.xp;
+document.getElementById("streak").innerText=data.streak;
+document.getElementById("rank").innerText="Rang : "+getRank();
+document.getElementById("score").innerText=data.score;
+
+document.getElementById("progressBar").style.width=(data.xp%(data.level*200))/(data.level*200)*100+"%";
+
+let lostYear=data.lostPerDay*365;
+document.getElementById("lostTime").innerText=
+lostYear+" heures perdues par an si tu continues.";
+
+let b=document.getElementById("badges");
+b.innerHTML="";
+[...new Set(data.badges)].forEach(badge=>{
+let s=document.createElement("span");
+s.className="badge";
+s.innerText=badge;
+b.appendChild(s);
+});
+
+document.getElementById("ai").innerText=generateAI();
+
+let ctx=document.getElementById("chart");
+new Chart(ctx,{
+type:"line",
+data:{
+labels:data.history.map((_,i)=>i+1),
+datasets:[{
+label:"XP",
+data:data.history,
+borderColor:"#22c55e",
+fill:false
+}]
+}
+});
+}
+
+if(data.username)render();
+
+</script>
+
+</body>
+</html>
